@@ -1,8 +1,6 @@
 package com.springbootandvueproject.demoproject.model;
 
-import com.sun.istack.NotNull;
 import lombok.*;
-import org.springframework.data.annotation.PersistenceConstructor;
 
 import javax.persistence.*;
 
@@ -13,12 +11,13 @@ import javax.persistence.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
-@Table
+@Builder
 @Entity
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
     @Column(name = "first_name")
     private String firstname;
@@ -29,3 +28,4 @@ public class User {
     @Column(name = "password")
     private String password;
 }
+
