@@ -1,8 +1,14 @@
 package com.springbootandvueproject.demoproject.api;
 
+import com.springbootandvueproject.demoproject.dto.UserDto;
 import com.springbootandvueproject.demoproject.model.User;
-import com.springbootandvueproject.demoproject.repository.UserRepository;
+import com.springbootandvueproject.demoproject.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Objects;
 
 /**
  * @author Zha_Aibek@mail.com
@@ -10,12 +16,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = "/api")
 public class UserController {
-    private final UserRepository userRepository;
+    @Autowired
+    private final UserService userService;
 
-    public UserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
-
 
     @GetMapping(value = "/hello")
     public String hello() {
@@ -23,7 +29,10 @@ public class UserController {
     }
 
     @PostMapping(value = "/register")
-    public User register(@RequestBody User user) {
-        return userRepository.save(user);
+    public User register(@RequestBody UserDto userDto) {
+        if (!Objects.equals(userDto.getPassword(), userDto.getPasswordConfirm()))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "password do not match");
+        var user = userService.save(userDto);
+        return user;
     }
 }
