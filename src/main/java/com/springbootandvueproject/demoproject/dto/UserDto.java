@@ -1,5 +1,6 @@
 package com.springbootandvueproject.demoproject.dto;
 
+import com.springbootandvueproject.demoproject.model.User;
 import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.Setter;

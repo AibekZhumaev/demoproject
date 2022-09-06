@@ -18,14 +18,18 @@ import java.util.Objects;
  */
 @Service
 @Transactional
-@AllArgsConstructor
 public class UserService {
-    @Autowired
-    private final UserRepository userRepository;
 
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public User save(UserDto userDto) {
+    @Autowired
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    public User register(UserDto userDto) {
         User user = new User(
                 userDto.getFirstName(),
                 userDto.getLastName(),
@@ -38,4 +42,12 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public User login(String email, String password) {
+        var user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid credentials"));
+
+        if (!passwordEncoder.matches(password, user.getPassword()))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid credentials");
+        return user;
+    }
 }

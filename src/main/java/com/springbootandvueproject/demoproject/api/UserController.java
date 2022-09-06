@@ -12,9 +12,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = "/api")
 public class UserController {
-    @Autowired
+
     private final UserService userService;
 
+    @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
     }
@@ -24,8 +25,22 @@ public class UserController {
         return "Hello!";
     }
 
-    @PostMapping(value = "/register")
-    public User register(@RequestBody UserDto userDto) {
-        return userService.save(userDto);
+    record RegisterResponse(String firstName, String lastName, String email, String password, String passwordConfirm) {
     }
+
+    @PostMapping(value = "/register")
+    public RegisterResponse registerUserAccount(@RequestBody UserDto userDto) {
+        var user = userService.register(userDto);
+        return new RegisterResponse(user.getFirstName(), user.getLastName(), user.getEmail(), user.getPassword(), user.getPasswordConfirm());
+    }
+
+    record LoginResponse(String firstName, String lastName, String email) {
+    }
+
+    @PostMapping(value = "/login")
+    public LoginResponse login(@RequestBody UserDto userDto) {
+        var user = userService.login(userDto.getEmail(), userDto.getPassword());
+        return new LoginResponse(user.getFirstName(), user.getLastName(), user.getEmail());
+    }
+
 }
