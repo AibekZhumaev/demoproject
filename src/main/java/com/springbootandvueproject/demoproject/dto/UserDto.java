@@ -14,6 +14,8 @@ import java.io.Serializable;
 @Setter
 public class UserDto implements Serializable {
     @NotNull
+    private Long id;
+    @NotNull
     private String firstName;
     @NotNull
     private String lastName;

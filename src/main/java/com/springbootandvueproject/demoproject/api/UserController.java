@@ -34,13 +34,16 @@ public class UserController {
         return new RegisterResponse(user.getFirstName(), user.getLastName(), user.getEmail(), user.getPassword(), user.getPasswordConfirm());
     }
 
-    record LoginResponse(String firstName, String lastName, String email) {
+    record LoginResponse(String token) {
+    }
+
+    record LoginRequest(String email, String password) {
     }
 
     @PostMapping(value = "/login")
-    public LoginResponse login(@RequestBody UserDto userDto) {
-        var user = userService.login(userDto.getEmail(), userDto.getPassword());
-        return new LoginResponse(user.getFirstName(), user.getLastName(), user.getEmail());
+    public LoginResponse login(@RequestBody LoginRequest loginRequest) {
+        var token = userService.login(loginRequest.email(), loginRequest.password());
+        return new LoginResponse(token.getToken());
     }
 
 }

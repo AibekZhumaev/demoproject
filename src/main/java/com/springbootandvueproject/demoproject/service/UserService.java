@@ -1,6 +1,7 @@
 package com.springbootandvueproject.demoproject.service;
 
 import com.springbootandvueproject.demoproject.dto.UserDto;
+import com.springbootandvueproject.demoproject.jwt.Token;
 import com.springbootandvueproject.demoproject.model.User;
 import com.springbootandvueproject.demoproject.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -42,12 +43,12 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User login(String email, String password) {
+    public Token login(String email, String password) {
         var user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid credentials"));
 
         if (!passwordEncoder.matches(password, user.getPassword()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid credentials");
-        return user;
+        return Token.of(user.getId(), 10L, "very_long_and_secure_safe_access_key");
     }
 }
