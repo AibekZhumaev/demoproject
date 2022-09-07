@@ -1,4 +1,4 @@
-package com.springbootandvueproject.demoproject.jwt;
+package com.springbootandvueproject.demoproject.security;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

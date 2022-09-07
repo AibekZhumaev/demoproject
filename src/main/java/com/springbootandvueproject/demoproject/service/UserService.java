@@ -1,33 +1,39 @@
 package com.springbootandvueproject.demoproject.service;
 
 import com.springbootandvueproject.demoproject.dto.UserDto;
-import com.springbootandvueproject.demoproject.jwt.Token;
+import com.springbootandvueproject.demoproject.security.Login;
 import com.springbootandvueproject.demoproject.model.User;
 import com.springbootandvueproject.demoproject.repository.UserRepository;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.transaction.Transactional;
 import java.util.Objects;
 
 /**
  * @author Zha_Aibek@mail.com
  */
 @Service
-@Transactional
+//@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final String accessTokenSecret;
+    private final String refreshTokenSecret;
 
-    @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            @Value("${application.security.access-token-secret}") String accessTokenSecret,
+            @Value("${application.security.refresh-token-secret}") String refreshTokenSecret) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.accessTokenSecret = accessTokenSecret;
+        this.refreshTokenSecret = refreshTokenSecret;
     }
 
     public User register(UserDto userDto) {
@@ -43,12 +49,12 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public Token login(String email, String password) {
+    public Login login(String email, String password) {
         var user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid credentials"));
 
         if (!passwordEncoder.matches(password, user.getPassword()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid credentials");
-        return Token.of(user.getId(), 10L, "very_long_and_secure_safe_access_key");
+        return Login.of(user.getId(), accessTokenSecret, refreshTokenSecret);
     }
 }
